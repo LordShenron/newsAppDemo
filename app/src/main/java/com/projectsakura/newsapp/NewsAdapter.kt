@@ -34,7 +34,7 @@ class NewsAdapter(val context: Context) : RecyclerView.Adapter<NewsViewHolder>()
 
         // Log data for debugging (optional)
         //Log.d("NewsAdapter", "News title at position $position: ${news.title}")
-        //Log.d("NewsAdapter", "News url at position $position: ${news.urlToImage}")
+        Log.d("NewsAdapter", "News content at position $position: ${news.content}")
 
         // Null check before setting title
         holder.titleTextView.text = news.title?.let {
@@ -54,18 +54,41 @@ class NewsAdapter(val context: Context) : RecyclerView.Adapter<NewsViewHolder>()
             holder.imageView.setImageResource(R.drawable.ic_no_image) // Placeholder image
         }
 
-
-        // Click listener to open article URL in WebView
+        // Click listener for the entire item layout
         holder.itemView.setOnClickListener {
             val url = news.url // Use null-safe navigation to access url
+
             if (url != null) {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                // Check if content needs to be fetched (based on your logic)
+                if (!news.isContentFetched) {
+                    // Implement logic to fetch content for this specific article using its URL
+                    fetchFullArticleContent(url) { fetchedContent ->
+                        // Update the article object and adapter after content is fetched
+                        news.content = fetchedContent
+                        news.isContentFetched = true
+                        notifyItemChanged(position) // Update specific item in the adapter
+                    }
+                }
+
+                // Regardless of content availability, launch the NewsDetailActivity
+                val intent = Intent(context, NewsDetailActivity::class.java)
+                intent.putExtra("newsUrl", url)
+                intent.putExtra("newsTitle", news.title) // Optional: Pass the title for display in NewsDetailActivity
                 context.startActivity(intent)
             } else {
                 // Handle case where url is null (e.g., display a toast message)
                 Toast.makeText(context, "Article URL unavailable", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    // Function to fetch full article content (replace with your actual implementation)
+    private fun fetchFullArticleContent(url: String, callback: (String) -> Unit) {
+        // Implement network call using Retrofit or other libraries to fetch content from the URL
+        // Parse the response and extract the full article content
+        // Call the callback function with the fetched content as a String
+        val fetchedContent = "Fetched content for: $url (replace with actual content retrieval)"
+        callback(fetchedContent)
     }
 
     override fun getItemCount(): Int = newsList.size
