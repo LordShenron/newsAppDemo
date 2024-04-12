@@ -11,6 +11,11 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.textview.MaterialTextView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class NewsAdapter(val context: Context) : RecyclerView.Adapter<NewsViewHolder>() {
 
@@ -56,39 +61,22 @@ class NewsAdapter(val context: Context) : RecyclerView.Adapter<NewsViewHolder>()
 
         // Click listener for the entire item layout
         holder.itemView.setOnClickListener {
-            val url = news.url // Use null-safe navigation to access url
+            val url = news.url
 
             if (url != null) {
-                // Check if content needs to be fetched (based on your logic)
-                if (!news.isContentFetched) {
-                    // Implement logic to fetch content for this specific article using its URL
-                    fetchFullArticleContent(url) { fetchedContent ->
-                        // Update the article object and adapter after content is fetched
-                        news.content = fetchedContent
-                        news.isContentFetched = true
-                        notifyItemChanged(position) // Update specific item in the adapter
-                    }
-                }
+                val content = news.content // Retrieve the content from the News object
 
-                // Regardless of content availability, launch the NewsDetailActivity
+                // Launch the NewsDetailActivity with the content passed as an extra
                 val intent = Intent(context, NewsDetailActivity::class.java)
                 intent.putExtra("newsUrl", url)
-                intent.putExtra("newsTitle", news.title) // Optional: Pass the title for display in NewsDetailActivity
+                intent.putExtra("newsTitle", news.title)
+                intent.putExtra("newsContent", content) // Pass the content data
                 context.startActivity(intent)
             } else {
                 // Handle case where url is null (e.g., display a toast message)
                 Toast.makeText(context, "Article URL unavailable", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    // Function to fetch full article content (replace with your actual implementation)
-    private fun fetchFullArticleContent(url: String, callback: (String) -> Unit) {
-        // Implement network call using Retrofit or other libraries to fetch content from the URL
-        // Parse the response and extract the full article content
-        // Call the callback function with the fetched content as a String
-        val fetchedContent = "Fetched content for: $url (replace with actual content retrieval)"
-        callback(fetchedContent)
     }
 
     override fun getItemCount(): Int = newsList.size
