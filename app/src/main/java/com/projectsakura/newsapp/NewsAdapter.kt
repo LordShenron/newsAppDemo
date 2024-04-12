@@ -33,8 +33,8 @@ class NewsAdapter(val context: Context) : RecyclerView.Adapter<NewsViewHolder>()
         val news = newsList[position]
 
         // Log data for debugging (optional)
-        Log.d("NewsAdapter", "News title at position $position: ${news.title}")
-        Log.d("NewsAdapter", "News url at position $position: ${news.urlToImage}")
+        //Log.d("NewsAdapter", "News title at position $position: ${news.title}")
+        //Log.d("NewsAdapter", "News url at position $position: ${news.urlToImage}")
 
         // Null check before setting title
         holder.titleTextView.text = news.title?.let {
@@ -42,7 +42,7 @@ class NewsAdapter(val context: Context) : RecyclerView.Adapter<NewsViewHolder>()
         } ?: "No Title Available"
 
         // Null check before setting title
-        holder.description.text = news.title?.let {
+        holder.description.text = news.description?.let {
             it.trim() // Optional transformation (e.g., trimming)
         } ?: "No Title Available"
 
