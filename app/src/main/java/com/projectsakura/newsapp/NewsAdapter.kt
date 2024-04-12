@@ -3,11 +3,9 @@ package com.projectsakura.newsapp
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.provider.DocumentsContract
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +33,7 @@ class NewsAdapter(val context: Context) : RecyclerView.Adapter<NewsViewHolder>()
                 for (element in articleContent) {
                     content.append(element.text()).append("\n")
                 }
-                Log.d("NewsAdapter", "Fetched content: $content")
+                //Log.d("NewsAdapter", "Fetched content: $content")
                 // Return the extracted article content
                 content.toString().trim()
             } catch (e: Exception) {
@@ -65,7 +63,7 @@ class NewsAdapter(val context: Context) : RecyclerView.Adapter<NewsViewHolder>()
             val url = news.url
             CoroutineScope(Dispatchers.Main).launch {
                 val content = fetchFullArticleContent(url)
-                Log.d("NewsAdapter", "Fetched content: $content")
+                //Log.d("NewsAdapter", "Fetched content: $content")
                 val intent = Intent(context, NewsDetailActivity::class.java)
                 intent.putExtra("newsUrl", url)
                 intent.putExtra("newsTitle", news.title)
