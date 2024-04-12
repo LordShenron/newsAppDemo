@@ -18,6 +18,7 @@ import org.jsoup.nodes.Document
 class NewsAdapter(val context: Context) : RecyclerView.Adapter<NewsViewHolder>() {
 
     private var newsList: List<News> = emptyList() // Initialize with empty list
+    private val contentCache = mutableMapOf<String, String?>() // Map to store fetched content
 
     // Function to fetch full article content using Jsoup
     private suspend fun fetchFullArticleContent(url: String): String? {
@@ -33,7 +34,7 @@ class NewsAdapter(val context: Context) : RecyclerView.Adapter<NewsViewHolder>()
                 for (element in articleContent) {
                     content.append(element.text()).append("\n")
                 }
-                //Log.d("NewsAdapter", "Fetched content: $content")
+
                 // Return the extracted article content
                 content.toString().trim()
             } catch (e: Exception) {
@@ -61,14 +62,22 @@ class NewsAdapter(val context: Context) : RecyclerView.Adapter<NewsViewHolder>()
 
         holder.itemView.setOnClickListener {
             val url = news.url
-            CoroutineScope(Dispatchers.Main).launch {
-                val content = fetchFullArticleContent(url)
-                //Log.d("NewsAdapter", "Fetched content: $content")
-                val intent = Intent(context, NewsDetailActivity::class.java)
-                intent.putExtra("newsUrl", url)
-                intent.putExtra("newsTitle", news.title)
-                intent.putExtra("newsContent", content)
-                context.startActivity(intent)
+
+            // Check if content is cached
+            val cachedContent = contentCache[url]
+            if (cachedContent != null) {
+                // If content is cached, open NewsDetailActivity with cached content
+                openNewsDetailActivity(url, news.title, cachedContent)
+            } else {
+                // If content is not cached, fetch and cache the content
+                CoroutineScope(Dispatchers.Main).launch {
+                    val content = fetchFullArticleContent(url)
+                    content?.let {
+                        // Cache the fetched content
+                        contentCache[url] = it
+                        openNewsDetailActivity(url, news.title, it)
+                    }
+                }
             }
         }
 
@@ -83,4 +92,12 @@ class NewsAdapter(val context: Context) : RecyclerView.Adapter<NewsViewHolder>()
     }
 
     override fun getItemCount(): Int = newsList.size
+
+    private fun openNewsDetailActivity(url: String, title: String?, content: String) {
+        val intent = Intent(context, NewsDetailActivity::class.java)
+        intent.putExtra("newsUrl", url)
+        intent.putExtra("newsTitle", title)
+        intent.putExtra("newsContent", content)
+        context.startActivity(intent)
+    }
 }

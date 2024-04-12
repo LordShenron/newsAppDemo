@@ -13,6 +13,8 @@ class NewsDetailActivity : AppCompatActivity() {
 
     private var newsUrl: String? = null
 
+    private val contentCache = mutableMapOf<String, String>()
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,10 +24,23 @@ class NewsDetailActivity : AppCompatActivity() {
         val title = intent.getStringExtra("newsTitle")
         newsUrl = intent.getStringExtra("newsUrl")
 
+        val uniqueKey = content?.hashCode()?.toString() ?: ""
+
         val contentTextView = findViewById<TextView>(R.id.news_content_text_view)
 
         if (content != null) {
-            contentTextView.text = content
+            if (contentCache.containsKey(uniqueKey)) {
+                // Display cached content
+                Log.d("NewsDetailActivity", "Content fetched from cache for unique key: $uniqueKey")
+                contentTextView.text = contentCache[uniqueKey]
+            } else {
+                // Display content fetched from intent
+                Log.d("NewsDetailActivity", "Content fetched from intent for unique key: $uniqueKey")
+                contentTextView.text = content
+                // Cache content
+                contentCache[uniqueKey] = content
+                Log.d("NewsDetailActivity", "Content cached for unique key: $uniqueKey")
+            }
             contentTextView.visibility = View.VISIBLE
         } else {
             contentTextView.visibility = View.GONE
@@ -52,4 +67,3 @@ class NewsDetailActivity : AppCompatActivity() {
         }
     }
 }
-

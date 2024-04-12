@@ -18,6 +18,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: NewsAdapter
     private lateinit var emptyView: View
 
+    private val contentCache = mutableMapOf<String, List<News>>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -29,6 +31,16 @@ class MainActivity : AppCompatActivity() {
 
         emptyView = findViewById(R.id.empty_view)
 
+        if (contentCache.isNotEmpty()) {
+            // Display cached content if available
+            adapter.updateNewsList(contentCache.values.flatten())
+            emptyView.visibility = if (adapter.itemCount == 0) View.VISIBLE else View.GONE
+        } else {
+            fetchNews()
+        }
+    }
+
+    private fun fetchNews() {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://newsapi.org/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -43,6 +55,8 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     adapter.updateNewsList(news)
                     emptyView.visibility = if (adapter.itemCount == 0) View.VISIBLE else View.GONE
+                    // Cache the fetched news
+                    contentCache["topHeadlines"] = news
                 }
             } catch (e: Exception) {
                 runOnUiThread {
