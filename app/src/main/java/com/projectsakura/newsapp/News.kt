@@ -1,3 +1,3 @@
 package com.projectsakura.newsapp
 
-data class News(val title: String, val url: String, val imageUrl: String = "")
+data class News(val title: String, val url: String, val description: String, val urlToImage: String = "")
