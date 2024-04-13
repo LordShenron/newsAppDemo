@@ -87,7 +87,7 @@ class NewsAdapter(val context: Context) : RecyclerView.Adapter<NewsViewHolder>()
         if (news.urlToImage.isNotEmpty()) {
             Glide.with(context).load(news.urlToImage).into(holder.imageView)
         } else {
-            holder.imageView.setImageResource(R.drawable.ic_no_image) // Placeholder image
+            holder.imageView.setImageResource(R.drawable.ic_launcher) // Placeholder image
         }
     }
 
